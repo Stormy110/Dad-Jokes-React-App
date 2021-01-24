@@ -1,23 +1,49 @@
-import logo from './logo.svg';
-import './App.css';
+import Header from "./Header";
+import Button from "./Button";
+import JokeGallery from "./JokeGallery";
+import "./App.css";
+import { useState } from "react";
 
 function App() {
+
+  const [jokeArray, setJokeArray] = useState([])
+
+  // useEffect tells React to perform actions
+  // that are not directly related to drawing,
+  // aka side effects---
+  // This is the equivalent of "window.onload"
+  // This side effect will run 1 time, no matter how 
+  // oftne React has to rerun the APP function
+  
+    async function getJoke(){
+    const jokePromise = fetch("https://icanhazdadjoke.com/", {
+      headers: {
+        Accept: "application/json",
+      }
+    });
+    const response = await jokePromise;
+    const jokeData = await response.json();
+    
+    
+    setJokeArray([
+      ...jokeArray, 
+      jokeData
+    ]);
+  }
+
+  function deleteJoke(id) {
+    console.log(`You want to delete ${id}`)
+    setJokeArray(jokeArray.filter(j=>{
+      return j.id !== id 
+    }))
+  }
+  
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Header />
+      <Button getJoke={getJoke}/>
+      <JokeGallery jokes={jokeArray} deleteJoke={deleteJoke}/>
     </div>
   );
 }
